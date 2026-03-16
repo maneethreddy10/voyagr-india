@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Voyagr India — AI Trip Planner</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+        href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400;1,600&family=Syne:wght@300;400;500;600;700&display=swap"
+        rel="stylesheet" />
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}" />
+</head>
+
+<body>
+
+    <!-- ░░ BACKGROUND SCENE ░░ -->
+    <div class="bg-scene" id="bgScene">
+        <div class="aurora aurora-1"></div>
+        <div class="aurora aurora-2"></div>
+        <div class="aurora aurora-3"></div>
+        <div class="aurora aurora-4"></div>
+        <div class="aurora aurora-5"></div>
+        <div class="grain-overlay"></div>
+    </div>
+
+    <!-- ░░ CURSOR ░░ -->
+    <div class="cursor-orb" id="cursorOrb"></div>
+    <div class="cursor-dot" id="cursorDot"></div>
+
+    <!-- ░░ APP ░░ -->
+    <div class="app" id="app">
+        <div class="container">
+
+            <!-- ══════════ HERO ══════════ -->
+            <section class="hero">
+                <div class="hero-eyebrow">
+                    <span class="eyebrow-dot"></span>
+                    🇮🇳 India's AI-Powered Travel Planner
+                    <span class="eyebrow-dot"></span>
+                </div>
+                <h1 class="hero-title">
+                    Every Journey,<br />
+                    <em>Perfectly Planned</em>
+                </h1>
+                <p class="hero-sub">
+                    Real hotels. Real routes. Real restaurants.<br />
+                    All prices in ₹ INR. Built for Indian travelers.
+                </p>
+                <div class="hero-scroll-hint">
+                    <span>Begin your journey</span>
+                    <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+                        <path d="M8 3v10M4 9l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"
+                            stroke-linejoin="round" />
+                    </svg>
+                </div>
+            </section>
+
+            <!-- ══════════ FORM ══════════ -->
+            <section id="formSection">
+                <div class="glass-card form-card" data-glass>
+
+                    <!-- Destination & Dates -->
+                    <div class="form-section-label">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2">
+                            <circle cx="12" cy="10" r="3" />
+                            <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z" />
+                        </svg>
+                        Destination & Timing
+                    </div>
+                    <div class="grid-2">
+                        <div class="field">
+                            <label for="destination">Where do you want to go?</label>
+                            <input id="destination" class="glass-input" type="text"
+                                placeholder="Dubai, Bali, Tokyo, Paris, Goa…" autocomplete="off" />
+                        </div>
+                        <div class="field">
+                            <label for="travelDate">When are you traveling?</label>
+                            <input id="travelDate" class="glass-input" type="text"
+                                placeholder="December 2025 / Summer / Diwali break" />
+                        </div>
+                    </div>
+
+                    <!-- Days, Travelers, Budget -->
+                    <div class="grid-3">
+                        <div class="field">
+                            <label for="days">Days of stay</label>
+                            <input id="days" class="glass-input" type="number" min="1" max="30" placeholder="7" />
+                        </div>
+                        <div class="field">
+                            <label for="travelers">No. of travelers</label>
+                            <input id="travelers" class="glass-input" type="number" min="1" placeholder="2" />
+                        </div>
+                        <div class="field">
+                            <label for="budget">Total budget (₹ INR)</label>
+                            <input id="budget" class="glass-input" type="text" placeholder="₹50,000" />
+                        </div>
+                    </div>
+
+                    <!-- Departure City -->
+                    <div class="grid-2">
+                        <div class="field">
+                            <label for="departureCity">Departing from</label>
+                            <select id="departureCity" class="glass-input">
+                                <option value="Mumbai">✈️ Mumbai (BOM)</option>
+                                <option value="Delhi">✈️ Delhi (DEL)</option>
+                                <option value="Bangalore">✈️ Bangalore (BLR)</option>
+                                <option value="Chennai">✈️ Chennai (MAA)</option>
+                                <option value="Hyderabad">✈️ Hyderabad (HYD)</option>
+                                <option value="Kolkata">✈️ Kolkata (CCU)</option>
+                                <option value="Pune">✈️ Pune (PNQ)</option>
+                                <option value="Ahmedabad">✈️ Ahmedabad (AMD)</option>
+                                <option value="Kochi">✈️ Kochi (COK)</option>
+                                <option value="Goa">✈️ Goa (GOI)</option>
+                            </select>
+                        </div>
+                        <div class="field">
+                            <label for="tripType">Trip type</label>
+                            <select id="tripType" class="glass-input">
+                                <option value="International">🌍 International Trip</option>
+                                <option value="Domestic India">🇮🇳 Domestic India Trip</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- Travel Style -->
+                    <div class="form-section-label" style="margin-top: 0.5rem">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2">
+                            <path
+                                d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
+                        </svg>
+                        Travel Style
+                    </div>
+                    <div class="pill-group" id="styleGroup">
+                        <button class="pill active" data-val="Relaxed Explorer">🌿 Relaxed</button>
+                        <button class="pill" data-val="Adventure Seeker">🧗 Adventure</button>
+                        <button class="pill" data-val="Cultural Immersion">🏛️ Cultural</button>
+                        <button class="pill" data-val="Luxury Indulgence">💎 Luxury</button>
+                        <button class="pill" data-val="Budget Backpacker">🎒 Backpacker</button>
+                        <button class="pill" data-val="Foodie Journey">🍜 Foodie</button>
+                        <button class="pill" data-val="Romantic Getaway">💑 Romantic</button>
+                        <button class="pill" data-val="Family Vacation">👨‍👩‍👧 Family</button>
+                    </div>
+
+                    <!-- Interests -->
+                    <div class="form-section-label" style="margin-top: 1.5rem">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2">
+                            <path
+                                d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
+                        </svg>
+                        Interests (select all that apply)
+                    </div>
+                    <div class="pill-group" id="interestGroup">
+                        <button class="pill active" data-val="Sightseeing & Landmarks">🗺️ Sightseeing</button>
+                        <button class="pill active" data-val="Local Food & Dining">🍽️ Local Food</button>
+                        <button class="pill" data-val="Nightlife & Bars">🌙 Nightlife</button>
+                        <button class="pill" data-val="Shopping & Markets">🛍️ Shopping</button>
+                        <button class="pill" data-val="Nature & Hiking">🌿 Nature</button>
+                        <button class="pill" data-val="Art & Museums">🎨 Art & Museums</button>
+                        <button class="pill" data-val="Beach & Water Sports">🏖️ Beach</button>
+                        <button class="pill" data-val="Wellness & Spa">🧘 Wellness</button>
+                        <button class="pill" data-val="Photography Spots">📸 Photography</button>
+                        <button class="pill" data-val="Religious & Heritage Sites">🕌 Heritage</button>
+                    </div>
+
+                    <!-- Preferences -->
+                    <div class="form-section-label" style="margin-top: 1.5rem">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2">
+                            <circle cx="12" cy="12" r="3" />
+                            <path d="M19.07 4.93a10 10 0 0 1 0 14.14M4.93 4.93a10 10 0 0 0 0 14.14" />
+                        </svg>
+                        Preferences
+                    </div>
+                    <div class="grid-2">
+                        <div class="field">
+                            <label for="dietary">Dietary preference</label>
+                            <select id="dietary" class="glass-input">
+                                <option value="No restrictions">🍖 No restrictions</option>
+                                <option value="Vegetarian">🥗 Vegetarian</option>
+                                <option value="Jain Vegetarian">🌱 Jain Vegetarian</option>
+                                <option value="Vegan">🌿 Vegan</option>
+                                <option value="Halal">☪️ Halal</option>
+                                <option value="Gluten-free">🌾 Gluten-free</option>
+                            </select>
+                        </div>
+                        <div class="field">
+                            <label for="accommodation">Accommodation type</label>
+                            <select id="accommodation" class="glass-input">
+                                <option value="Hotel">🏨 Hotel</option>
+                                <option value="Boutique Hotel">🏡 Boutique Hotel</option>
+                                <option value="Resort">🏝️ Resort</option>
+                                <option value="Hostel">🛏️ Hostel</option>
+                                <option value="Airbnb / Apartment">🏠 Airbnb / Apartment</option>
+                                <option value="Heritage / Palace Hotel">🏰 Heritage / Palace Hotel</option>
+                                <option value="Homestay">🤝 Homestay</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- Generate Button -->
+                    <button class="btn-generate" id="generateBtn" onclick="handleGenerate()">
+                        <span class="btn-text">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2">
+                                <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" />
+                            </svg>
+                            Plan My Perfect Trip ✈️
+                        </span>
+                        <span class="btn-glow"></span>
+                    </button>
+
+                </div>
+            </section>
+
+            <!-- ══════════ LOADING ══════════ -->
+            <section id="loadingSection" style="display:none">
+                <div class="glass-card loading-card" data-glass>
+                    <div class="loading-orb-wrap">
+                        <div class="loading-orb"></div>
+                        <div class="loading-orb-inner"></div>
+                    </div>
+                    <h2 class="loading-title">Crafting your journey…</h2>
+                    <p class="loading-sub">Fetching real data from multiple sources</p>
+                    <div class="loading-steps" id="loadingSteps">
+                        <div class="loading-step" id="lstep-0">
+                            <div class="step-icon">🌤️</div>
+                            <div class="step-text">Fetching live weather at destination</div>
+                            <div class="step-check">✓</div>
+                        </div>
+                        <div class="loading-step" id="lstep-1">
+                            <div class="step-icon">💱</div>
+                            <div class="step-text">Getting live INR exchange rates</div>
+                            <div class="step-check">✓</div>
+                        </div>
+                        <div class="loading-step" id="lstep-2">
+                            <div class="step-icon">🏨</div>
+                            <div class="step-text">Finding real verified hotels</div>
+                            <div class="step-check">✓</div>
+                        </div>
+                        <div class="loading-step" id="lstep-3">
+                            <div class="step-icon">🍽️</div>
+                            <div class="step-text">Fetching top-rated restaurants from Yelp</div>
+                            <div class="step-check">✓</div>
+                        </div>
+                        <div class="loading-step" id="lstep-4">
+                            <div class="step-icon">🗺️</div>
+                            <div class="step-text">Finding real attractions via Foursquare</div>
+                            <div class="step-check">✓</div>
+                        </div>
+                        <div class="loading-step" id="lstep-5">
+                            <div class="step-icon">🤖</div>
+                            <div class="step-text">Building your personalised itinerary</div>
+                            <div class="step-check">✓</div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ══════════ RESULTS ══════════ -->
+            <section id="resultsSection" style="display:none">
+                <div class="glass-card results-card" data-glass id="resultsCard">
+                </div>
+            </section>
+
+        </div>
+    </div>
+
+    <script src="{{ url_for('static', filename='app.js') }}"></script>
+</body>
+
+</html>
