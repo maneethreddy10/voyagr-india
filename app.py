@@ -6,20 +6,21 @@ import urllib.error
 from flask import Flask, render_template, request, jsonify
 from flask_cors import CORS
 from dotenv import load_dotenv
-from groq import Groq
+import google.generativeai as genai
 
 load_dotenv()
 
 app = Flask(__name__)
 CORS(app)
 
-GROQ_API_KEY         = os.getenv("GROQ_API_KEY")
+GEMINI_API_KEY         = os.getenv("GEMINI_API_KEY")
 OPENWEATHER_API_KEY  = os.getenv("OPENWEATHER_API_KEY")
 FOURSQUARE_API_KEY   = os.getenv("FOURSQUARE_API_KEY")
 EXCHANGERATE_API_KEY = os.getenv("EXCHANGERATE_API_KEY")
-YELP_API_KEY         = os.getenv("YELP_API_KEY")
+GOOGLE_PLACES_API_KEY = os.getenv("GOOGLE_PLACES_API_KEY")
 
-groq_client = Groq(api_key=GROQ_API_KEY)
+if GEMINI_API_KEY:
+    genai.configure(api_key=GEMINI_API_KEY)
 
 
 # ─── 1. OPENWEATHERMAP ────────────────────────────────────────────────────────
@@ -115,43 +116,46 @@ def get_foursquare_data(destination):
     return results
 
 
-# ─── 4. YELP ─────────────────────────────────────────────────────────────────
+# ─── 4. GOOGLE PLACES ──────────────────────────────────────────────────────────
 
-def get_yelp_restaurants(destination, dietary=None):
+def get_google_places_restaurants(destination, dietary=None):
     try:
-        term     = "restaurants"
+        query = "restaurants"
         if dietary and dietary != "No restrictions":
-            term = f"{dietary} restaurants"
+            query = f"{dietary} restaurants"
         location = destination + ", India" if not any(c in destination.lower() for c in ["dubai","paris","tokyo","bali","london","singapore","bangkok","new york","sydney"]) else destination
-        params   = {"term": term, "location": location, "limit": 15, "sort_by": "rating"}
-        url      = "https://api.yelp.com/v3/businesses/search?" + urllib.parse.urlencode(params)
-        req      = urllib.request.Request(
-            url,
-            headers={"Authorization": f"Bearer {YELP_API_KEY}", "Accept": "application/json"},
-        )
+        full_query = f"{query} in {location}"
+        
+        params = {
+            "query": full_query,
+            "key": GOOGLE_PLACES_API_KEY
+        }
+        url = "https://maps.googleapis.com/maps/api/place/textsearch/json?" + urllib.parse.urlencode(params)
+        req = urllib.request.Request(url, headers={"Accept": "application/json"})
+        
         with urllib.request.urlopen(req, timeout=10) as r:
             data = json.loads(r.read().decode())
+        
         restaurants = []
-        for b in data.get("businesses", []):
-            cats = b.get("categories", [])
+        for b in data.get("results", [])[:15]:
             restaurants.append({
                 "name":         b.get("name", ""),
                 "rating":       b.get("rating", ""),
-                "review_count": b.get("review_count", 0),
-                "price":        b.get("price", "$$"),
-                "cuisine":      cats[0].get("title", "") if cats else "",
-                "address":      " ".join(b.get("location", {}).get("display_address", [])),
-                "maps_query":   f"{b.get('name', '')} {destination} restaurant",
+                "review_count": b.get("user_ratings_total", 0),
+                "price":        "$" * b.get("price_level", 2) if b.get("price_level") else "$$",
+                "cuisine":      "Restaurant",
+                "address":      b.get("formatted_address", ""),
+                "maps_query":   f"{b.get('name', '')} {destination}",
             })
         return {"success": True, "restaurants": restaurants}
     except Exception as e:
-        print(f"Yelp error: {e}")
+        print(f"Google Places error: {e}")
         return {"success": False, "restaurants": []}
 
 
-# ─── 5. GROQ PROMPT ──────────────────────────────────────────────────────────
+# ─── 5. GEMINI PROMPT ──────────────────────────────────────────────────────────
 
-def build_prompt(data, weather_info=None, exchange_info=None, foursquare_data=None, yelp_data=None):
+def build_prompt(data, weather_info=None, exchange_info=None, foursquare_data=None, restaurants_data=None):
     destination   = data.get("destination", "")
     days          = data.get("days", "7")
     travelers     = data.get("travelers", "2")
@@ -206,9 +210,9 @@ ALL prices must be in INR only.
         transport_ctx = f"VERIFIED TRANSPORT from Foursquare in {destination}:\n{', '.join(names)}"
 
     restaurant_ctx = ""
-    if yelp_data and yelp_data.get("restaurants"):
-        rest_list = [f"{r['name']} (Rating:{r['rating']}/5, {r['cuisine']}, {r['price']})" for r in yelp_data["restaurants"]]
-        restaurant_ctx = f"VERIFIED RESTAURANTS from Yelp in {destination} ({len(rest_list)} found):\n" + "\n".join(rest_list) + "\nUse these real restaurants."
+    if restaurants_data and restaurants_data.get("restaurants"):
+        rest_list = [f"{r['name']} (Rating:{r['rating']}/5, {r['cuisine']}, {r['price']})" for r in restaurants_data["restaurants"]]
+        restaurant_ctx = f"VERIFIED RESTAURANTS in {destination} ({len(rest_list)} found):\n" + "\n".join(rest_list) + "\nUse these real restaurants."
 
     return f"""You are an elite Indian travel planner helping Indian travelers plan trips from India.
 ALL prices MUST be in Indian Rupees (INR). Never use USD for prices.
@@ -220,7 +224,7 @@ CRITICAL RULES — MUST FOLLOW:
 4. Generate AT LEAST 6 transport options
 5. ALL prices in INR only
 6. Every hotel, restaurant, attraction must be REAL and currently operating
-7. Prioritize verified Foursquare and Yelp places listed below
+7. Prioritize verified Foursquare and Google Places listed below
 8. No placeholder names ever
 
 Trip details:
@@ -353,8 +357,8 @@ def index():
 @app.route("/generate", methods=["POST"])
 def generate():
     try:
-        if not GROQ_API_KEY:
-            return jsonify({"error": "GROQ_API_KEY not found in .env file"}), 500
+        if not GEMINI_API_KEY:
+            return jsonify({"error": "GEMINI_API_KEY not found in .env file"}), 500
 
         data        = request.get_json()
         if not data.get("destination"):
@@ -383,25 +387,21 @@ def generate():
             print(f"Fetching Foursquare places for {destination}...")
             foursquare_data = get_foursquare_data(destination)
 
-        # 4. Yelp
-        yelp_data = None
-        if YELP_API_KEY:
-            print(f"Fetching Yelp restaurants for {destination}...")
-            yelp_data = get_yelp_restaurants(destination, dietary)
-            print(f"Yelp: {len(yelp_data.get('restaurants',[]))} found" if yelp_data.get("success") else "Yelp failed")
+        # 4. Google Places
+        restaurants_data = None
+        if GOOGLE_PLACES_API_KEY:
+            print(f"Fetching Google Places restaurants for {destination}...")
+            restaurants_data = get_google_places_restaurants(destination, dietary)
+            print(f"Google Places: {len(restaurants_data.get('restaurants',[]))} found" if restaurants_data.get("success") else "Google Places failed")
 
-        # 5. Groq
-        prompt = build_prompt(data, weather_info, exchange_info, foursquare_data, yelp_data)
-        print(f"Calling Groq AI for {data.get('days')} day trip to {destination}...")
+        # 5. Gemini
+        prompt = build_prompt(data, weather_info, exchange_info, foursquare_data, restaurants_data)
+        print(f"Calling Gemini AI for {data.get('days')} day trip to {destination}...")
 
-        response = groq_client.chat.completions.create(
-            model="llama-3.3-70b-versatile",
-            messages=[{"role": "user", "content": prompt}],
-            max_tokens=32768,
-            temperature=0.7
-        )
+        model = genai.GenerativeModel('gemini-3.5-flash', generation_config={"response_mime_type": "application/json"})
+        response = model.generate_content(prompt)
 
-        raw  = response.choices[0].message.content.strip()
+        raw  = response.text.strip()
         raw  = raw.replace("```json", "").replace("```", "").strip()
         plan = json.loads(raw)
 
@@ -410,8 +410,8 @@ def generate():
             plan["live_weather"] = weather_info
         if exchange_info and exchange_info.get("success"):
             plan["live_exchange"] = exchange_info
-        if yelp_data and yelp_data.get("success"):
-            plan["yelp_restaurants"] = yelp_data["restaurants"]
+        if restaurants_data and restaurants_data.get("success"):
+            plan["restaurants_data"] = restaurants_data["restaurants"]
         if foursquare_data:
             plan["foursquare_places"] = foursquare_data
 
@@ -433,9 +433,9 @@ if __name__ == "__main__":
     port  = int(os.getenv("PORT", 5000))
     debug = os.getenv("FLASK_DEBUG", "false").lower() == "true"
     print(f"\n🇮🇳 Voyagr India — Trip Planner running on http://localhost:{port}")
-    print(f"Groq:         {'YES' if GROQ_API_KEY         else 'NOT FOUND'}")
+    print(f"Gemini:       {'YES' if GEMINI_API_KEY         else 'NOT FOUND'}")
     print(f"OpenWeather:  {'YES' if OPENWEATHER_API_KEY  else 'NOT FOUND'}")
     print(f"Foursquare:   {'YES' if FOURSQUARE_API_KEY   else 'NOT FOUND'}")
     print(f"ExchangeRate: {'YES' if EXCHANGERATE_API_KEY else 'NOT FOUND'}")
-    print(f"Yelp:         {'YES' if YELP_API_KEY         else 'NOT FOUND'}\n")
+    print(f"GooglePlaces: {'YES' if GOOGLE_PLACES_API_KEY else 'NOT FOUND'}\n")
     app.run(debug=debug, port=port)
