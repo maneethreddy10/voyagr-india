@@ -48,12 +48,17 @@
                     Real hotels. Real routes. Real restaurants.<br />
                     All prices in ₹ INR. Built for Indian travelers.
                 </p>
-                <div class="hero-scroll-hint">
-                    <span>Begin your journey</span>
-                    <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-                        <path d="M8 3v10M4 9l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"
-                            stroke-linejoin="round" />
-                    </svg>
+                <div class="hero-actions">
+                    <div class="hero-scroll-hint">
+                        <span>Begin your journey</span>
+                        <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+                            <path d="M8 3v10M4 9l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"
+                                stroke-linejoin="round" />
+                        </svg>
+                    </div>
+                    <a href="/trending" class="trending-nav-btn">
+                        🔥 Trending Now on Reddit
+                    </a>
                 </div>
             </section>
 
@@ -264,6 +269,20 @@
             <!-- ══════════ RESULTS ══════════ -->
             <section id="resultsSection" style="display:none">
                 <div class="glass-card results-card" data-glass id="resultsCard">
+                </div>
+                <!-- Social Buzz Section -->
+                <div class="glass-card social-buzz-card" id="socialBuzzCard" style="display:none" data-glass>
+                    <div class="buzz-header">
+                        <div class="buzz-title-row">
+                            <span class="buzz-icon">🔥</span>
+                            <h2 class="buzz-title">Social Buzz on Reddit</h2>
+                            <span class="buzz-badge" id="buzzSource">Live</span>
+                        </div>
+                        <p class="buzz-sub">What real travelers are saying right now about <strong id="buzzPlaceName"></strong></p>
+                    </div>
+                    <div class="buzz-sentiment-bars" id="buzzBars"></div>
+                    <div class="buzz-topics" id="buzzTopics"></div>
+                    <div class="buzz-reviews" id="buzzReviews"></div>
                 </div>
             </section>
 

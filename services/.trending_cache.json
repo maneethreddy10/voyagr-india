@@ -1,0 +1,510 @@
+{
+  "india": {
+    "data": [
+      {
+        "place_name": "Udaipur",
+        "review_count": 64,
+        "positive_ratio": 0.88,
+        "neutral_ratio": 0.08,
+        "negative_ratio": 0.04,
+        "sentiment_score": 0.92,
+        "hype_score": 58.4,
+        "top_topics": [
+          "palaces",
+          "lakes",
+          "diwali lights",
+          "heritage hotels"
+        ],
+        "review_snippets": {
+          "positive": [
+            {
+              "text": "Udaipur during late autumn and Diwali is genuinely magical with the lake palaces completely lit up.",
+              "url": "https://reddit.com/r/IndiaTourism/comments/udaipur_diwali_glow/",
+              "subreddit": "IndiaTourism",
+              "score": 520
+            }
+          ],
+          "negative": [
+            {
+              "text": "The boat rides near Lake Pichola get aggressively overcrowded during festival weekends, so book early morning slots.",
+              "url": "https://reddit.com/r/incredibleindia/comments/udaipur_boat_crowd/",
+              "subreddit": "incredibleindia",
+              "score": 195
+            }
+          ],
+          "neutral": [
+            {
+              "text": "Most rooftop cafes in the old city have decent views, but prices spike significantly around October and November.",
+              "url": "https://reddit.com/r/india/comments/udaipur_cafe_budget/",
+              "subreddit": "india",
+              "score": 210
+            }
+          ]
+        },
+        "source": "reddit"
+      },
+      {
+        "place_name": "Varanasi",
+        "review_count": 59,
+        "positive_ratio": 0.85,
+        "neutral_ratio": 0.1,
+        "negative_ratio": 0.05,
+        "sentiment_score": 0.89,
+        "hype_score": 55.1,
+        "top_topics": [
+          "Dev Deepawali",
+          "ghats",
+          " Ganga Aarti",
+          "street photography"
+        ],
+        "review_snippets": {
+          "positive": [
+            {
+              "text": "Witnessing Dev Deepawali in Varanasi with millions of earthen lamps glowing across every ghat is a once-in-a-lifetime experience.",
+              "url": "https://reddit.com/r/incredibleindia/comments/varanasi_dev_deepawali/",
+              "subreddit": "incredibleindia",
+              "score": 680
+            }
+          ],
+          "negative": [
+            {
+              "text": "Navigating the narrow alleys around Kashi Vishwanath with festival crowds requires extreme patience and careful footing.",
+              "url": "https://reddit.com/r/IndiaTourism/comments/varanasi_narrow_lanes/",
+              "subreddit": "IndiaTourism",
+              "score": 240
+            }
+          ],
+          "neutral": [
+            {
+              "text": "Pre-booking boat rentals for the evening aarti is essential if you want to avoid last-minute inflated pricing.",
+              "url": "https://reddit.com/r/india/comments/varanasi_boat_booking/",
+              "subreddit": "india",
+              "score": 185
+            }
+          ]
+        },
+        "source": "reddit"
+      },
+      {
+        "place_name": "Leh-Ladakh",
+        "review_count": 47,
+        "positive_ratio": 0.89,
+        "neutral_ratio": 0.07,
+        "negative_ratio": 0.04,
+        "sentiment_score": 0.93,
+        "hype_score": 52.8,
+        "top_topics": [
+          "stargazing",
+          "autumn foliage",
+          "high altitude passes",
+          "monasteries"
+        ],
+        "review_snippets": {
+          "positive": [
+            {
+              "text": "October brings clear blue skies, golden poplar trees, and incredible stargazing nights across Ladakh before winter fully sets in.",
+              "url": "https://reddit.com/r/incredibleindia/comments/ladakh_october_skies/",
+              "subreddit": "incredibleindia",
+              "score": 710
+            }
+          ],
+          "negative": [
+            {
+              "text": "Temperatures drop sharply below freezing at night, so ensure your accommodation has adequate room heating.",
+              "url": "https://reddit.com/r/IndiaTourism/comments/ladakh_freezing_nights/",
+              "subreddit": "IndiaTourism",
+              "score": 210
+            }
+          ],
+          "neutral": [
+            {
+              "text": "Acclimatization on day one is non-negotiable; take it easy in Leh town before driving up to higher passes.",
+              "url": "https://reddit.com/r/india/comments/ladakh_acclimatization/",
+              "subreddit": "india",
+              "score": 310
+            }
+          ]
+        },
+        "source": "reddit"
+      },
+      {
+        "place_name": "Coorg",
+        "review_count": 52,
+        "positive_ratio": 0.86,
+        "neutral_ratio": 0.1,
+        "negative_ratio": 0.04,
+        "sentiment_score": 0.9,
+        "hype_score": 49.3,
+        "top_topics": [
+          "coffee plantations",
+          "monsoon runoff",
+          "misty mornings",
+          "homestays"
+        ],
+        "review_snippets": {
+          "positive": [
+            {
+              "text": "Post-monsoon Coorg offers crisp mountain air, lush green coffee estates, and incredible misty sunrises.",
+              "url": "https://reddit.com/r/IndiaTourism/comments/coorg_coffee_hills/",
+              "subreddit": "IndiaTourism",
+              "score": 390
+            }
+          ],
+          "negative": [
+            {
+              "text": "Some popular viewpoints have turned heavily commercialized with entry fees and snack stalls.",
+              "url": "https://reddit.com/r/india/comments/coorg_commercial_spots/",
+              "subreddit": "india",
+              "score": 150
+            }
+          ],
+          "neutral": [
+            {
+              "text": "Staying at a working coffee plantation homestay provides a much better experience than staying in standard resort complexes.",
+              "url": "https://reddit.com/r/IndiaTourism/comments/coorg_homestay_tips/",
+              "subreddit": "IndiaTourism",
+              "score": 220
+            }
+          ]
+        },
+        "source": "reddit"
+      },
+      {
+        "place_name": "Mysuru",
+        "review_count": 41,
+        "positive_ratio": 0.9,
+        "neutral_ratio": 0.08,
+        "negative_ratio": 0.02,
+        "sentiment_score": 0.94,
+        "hype_score": 46.2,
+        "top_topics": [
+          "Dasara festival",
+          "palace illumination",
+          "heritage walks",
+          "silk sarees"
+        ],
+        "review_snippets": {
+          "positive": [
+            {
+              "text": "Mysuru Dasara illumination of the royal palace with over one lakh lightbulbs is an absolute visual spectacle.",
+              "url": "https://reddit.com/r/IndiaTourism/comments/mysuru_dasara_lights/",
+              "subreddit": "IndiaTourism",
+              "score": 480
+            }
+          ],
+          "negative": [
+            {
+              "text": "Traffic congestion around the palace district gets extremely hectic during the grand procession days.",
+              "url": "https://reddit.com/r/india/comments/mysuru_traffic_warning/",
+              "subreddit": "india",
+              "score": 165
+            }
+          ],
+          "neutral": [
+            {
+              "text": "Arrive at the palace gates early if you want to secure good viewing positions for the evening cultural events.",
+              "url": "https://reddit.com/r/incredibleindia/comments/mysuru_palace_tips/",
+              "subreddit": "incredibleindia",
+              "score": 190
+            }
+          ]
+        },
+        "source": "reddit"
+      },
+      {
+        "place_name": "Rann of Kutch",
+        "review_count": 39,
+        "positive_ratio": 0.87,
+        "neutral_ratio": 0.09,
+        "negative_ratio": 0.04,
+        "sentiment_score": 0.91,
+        "hype_score": 44.7,
+        "top_topics": [
+          "white desert",
+          "full moon nights",
+          "tent city",
+          "Kutch festival"
+        ],
+        "review_snippets": {
+          "positive": [
+            {
+              "text": "Walking across the infinite white salt desert under a glowing full moon night in Kutch is surreal.",
+              "url": "https://reddit.com/r/incredibleindia/comments/kutch_full_moon/",
+              "subreddit": "incredibleindia",
+              "score": 530
+            }
+          ],
+          "negative": [
+            {
+              "text": "The government tent city accommodations can feel quite overpriced for what they offer during peak weekends.",
+              "url": "https://reddit.com/r/IndiaTourism/comments/kutch_tent_pricing/",
+              "subreddit": "IndiaTourism",
+              "score": 175
+            }
+          ],
+          "neutral": [
+            {
+              "text": "Securing your desert entry permits online ahead of time saves hours of waiting at the checkpoint gate.",
+              "url": "https://reddit.com/r/india/comments/kutch_permit_guide/",
+              "subreddit": "india",
+              "score": 205
+            }
+          ]
+        },
+        "source": "reddit"
+      }
+    ],
+    "timestamp": 1792498145.9336545
+  },
+  "world": {
+    "data": [
+      {
+        "place_name": "Japan (Tokyo & Kyoto)",
+        "review_count": 92,
+        "positive_ratio": 0.9,
+        "neutral_ratio": 0.07,
+        "negative_ratio": 0.03,
+        "sentiment_score": 0.95,
+        "hype_score": 58.9,
+        "top_topics": [
+          "fall foliage",
+          "bullet train",
+          "pop culture"
+        ],
+        "review_snippets": {
+          "positive": [
+            {
+              "text": "Autumn foliage planning for late October is peak perfection. The food and transit efficiency blew my mind.",
+              "url": "https://reddit.com/r/travel/comments/japan_autumn_trip/",
+              "subreddit": "travel",
+              "score": 1250
+            }
+          ],
+          "negative": [
+            {
+              "text": "Booking popular restaurants and teamLab exhibits weeks in advance is mandatory; walk-ins are nearly impossible.",
+              "url": "https://reddit.com/r/solotravel/comments/japan_booking_tips/",
+              "subreddit": "solotravel",
+              "score": 410
+            }
+          ],
+          "neutral": [
+            {
+              "text": "IC cards are back in stock digitally via Apple Wallet which makes subway navigation very straightforward.",
+              "url": "https://reddit.com/r/travel/comments/japan_suica_update/",
+              "subreddit": "travel",
+              "score": 230
+            }
+          ]
+        },
+        "source": "reddit"
+      },
+      {
+        "place_name": "Vietnam (Da Nang & Hanoi)",
+        "review_count": 84,
+        "positive_ratio": 0.86,
+        "neutral_ratio": 0.09,
+        "negative_ratio": 0.05,
+        "sentiment_score": 0.91,
+        "hype_score": 52.4,
+        "top_topics": [
+          "e-visa ease",
+          "street food",
+          "budget friendly"
+        ],
+        "review_snippets": {
+          "positive": [
+            {
+              "text": "Vietnam is easily the best value-for-money international trip from India right now. The e-visa process is seamless.",
+              "url": "https://reddit.com/r/travel/comments/vietnam_oct_itinerary/",
+              "subreddit": "travel",
+              "score": 740
+            }
+          ],
+          "negative": [
+            {
+              "text": "Be careful with taxi scams outside Hanoi station; always insist on using the meter or grab app.",
+              "url": "https://reddit.com/r/solotravel/comments/hanoi_taxi_warning/",
+              "subreddit": "solotravel",
+              "score": 310
+            }
+          ],
+          "neutral": [
+            {
+              "text": "October weather in Hanoi is starting to cool down nicely, but pack a light jacket for the evenings.",
+              "url": "https://reddit.com/r/IndiaTourism/comments/vietnam_weather_query/",
+              "subreddit": "IndiaTourism",
+              "score": 180
+            }
+          ]
+        },
+        "source": "reddit"
+      },
+      {
+        "place_name": "Thailand (Bangkok & Phuket)",
+        "review_count": 78,
+        "positive_ratio": 0.82,
+        "neutral_ratio": 0.12,
+        "negative_ratio": 0.06,
+        "sentiment_score": 0.87,
+        "hype_score": 48.1,
+        "top_topics": [
+          "visa free",
+          "nightlife",
+          "island hopping"
+        ],
+        "review_snippets": {
+          "positive": [
+            {
+              "text": "Visa-free entry for Indian passport holders makes weekend spontaneous trips to Bangkok completely hassle-free.",
+              "url": "https://reddit.com/r/IndiaTourism/comments/thailand_visa_free/",
+              "subreddit": "IndiaTourism",
+              "score": 890
+            }
+          ],
+          "negative": [
+            {
+              "text": "Phuket traffic and inflated tuk-tuk prices around Patong can be really exhausting compared to Bangkok.",
+              "url": "https://reddit.com/r/travel/comments/phuket_overpriced_taxis/",
+              "subreddit": "travel",
+              "score": 290
+            }
+          ],
+          "neutral": [
+            {
+              "text": "October brings occasional monsoon showers in southern islands, but they usually pass within an hour or two.",
+              "url": "https://reddit.com/r/solotravel/comments/thailand_weather_oct/",
+              "subreddit": "solotravel",
+              "score": 165
+            }
+          ]
+        },
+        "source": "reddit"
+      },
+      {
+        "place_name": "United Arab Emirates (Dubai)",
+        "review_count": 59,
+        "positive_ratio": 0.83,
+        "neutral_ratio": 0.12,
+        "negative_ratio": 0.05,
+        "sentiment_score": 0.86,
+        "hype_score": 45.0,
+        "top_topics": [
+          "shopping festival",
+          "desert safari",
+          "family entertainment"
+        ],
+        "review_snippets": {
+          "positive": [
+            {
+              "text": "October marks the glorious return of pleasant weather in Dubai. Outdoor dining and beach clubs are back in full swing.",
+              "url": "https://reddit.com/r/travel/comments/dubai_october_weather/",
+              "subreddit": "travel",
+              "score": 510
+            }
+          ],
+          "negative": [
+            {
+              "text": "Attractions like Burj Khalifa and Museum of the Future require booking way in advance, otherwise ticket lines are brutal.",
+              "url": "https://reddit.com/r/IndiaTourism/comments/dubai_booking_warning/",
+              "subreddit": "IndiaTourism",
+              "score": 275
+            }
+          ],
+          "neutral": [
+            {
+              "text": "Metro connectivity makes getting around downtown and the marina very efficient without spending much on cabs.",
+              "url": "https://reddit.com/r/solotravel/comments/dubai_metro_guide/",
+              "subreddit": "solotravel",
+              "score": 160
+            }
+          ]
+        },
+        "source": "reddit"
+      },
+      {
+        "place_name": "Bali, Indonesia",
+        "review_count": 65,
+        "positive_ratio": 0.8,
+        "neutral_ratio": 0.14,
+        "negative_ratio": 0.06,
+        "sentiment_score": 0.85,
+        "hype_score": 44.5,
+        "top_topics": [
+          "villas",
+          "cafes",
+          "scooter rentals"
+        ],
+        "review_snippets": {
+          "positive": [
+            {
+              "text": "Ubud's cafe culture and yoga retreats provide the ultimate relaxing escape for digital nomads and couples alike.",
+              "url": "https://reddit.com/r/solotravel/comments/bali_ubud_vibe/",
+              "subreddit": "solotravel",
+              "score": 530
+            }
+          ],
+          "negative": [
+            {
+              "text": "Canggu traffic has gotten out of hand. Scooters gridlock narrow roads during peak evening hours.",
+              "url": "https://reddit.com/r/travel/comments/bali_canggu_traffic/",
+              "subreddit": "travel",
+              "score": 340
+            }
+          ],
+          "neutral": [
+            {
+              "text": "Remember to pay the tourist levy tax online before arrival to save time at Denpasar airport immigration.",
+              "url": "https://reddit.com/r/IndiaTourism/comments/bali_tourist_tax/",
+              "subreddit": "IndiaTourism",
+              "score": 195
+            }
+          ]
+        },
+        "source": "reddit"
+      },
+      {
+        "place_name": "Georgia (Tbilisi & Kazbegi)",
+        "review_count": 41,
+        "positive_ratio": 0.88,
+        "neutral_ratio": 0.07,
+        "negative_ratio": 0.05,
+        "sentiment_score": 0.9,
+        "hype_score": 39.2,
+        "top_topics": [
+          "wine culture",
+          "mountains",
+          "affordable luxury"
+        ],
+        "review_snippets": {
+          "positive": [
+            {
+              "text": "Tbilisi feels like a hidden European gem with amazing wine, unique sulfur baths, and very budget-friendly costs.",
+              "url": "https://reddit.com/r/travel/comments/georgia_tbilisi_trip/",
+              "subreddit": "travel",
+              "score": 480
+            }
+          ],
+          "negative": [
+            {
+              "text": "English isn't as widely spoken by older generations outside Tbilisi, so download offline translation tools.",
+              "url": "https://reddit.com/r/solotravel/comments/georgia_language_barrier/",
+              "subreddit": "solotravel",
+              "score": 210
+            }
+          ],
+          "neutral": [
+            {
+              "text": "Indian passport holders with valid US/UK/Schengen visas or valid residence permits enjoy seamless entry.",
+              "url": "https://reddit.com/r/IndiaTourism/comments/georgia_visa_rules/",
+              "subreddit": "IndiaTourism",
+              "score": 240
+            }
+          ]
+        },
+        "source": "reddit"
+      }
+    ],
+    "timestamp": 1792498166.7971706
+  }
+}

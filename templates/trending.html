@@ -1,0 +1,648 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Trending Now — Voyagr India</title>
+    <meta name="description" content="Discover the most hyped travel destinations on Reddit right now, with real sentiment analysis from traveler posts." />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400;1,600&family=Syne:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}" />
+    <style>
+        /* ── Trending page specific styles ── */
+        .trending-page { padding: 2rem 0 6rem; }
+
+        .trending-header {
+            text-align: center;
+            margin-bottom: 2.5rem;
+        }
+
+        .back-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.55rem;
+            color: #3b0764;
+            background: rgba(255, 255, 255, 0.7);
+            border: 1.5px solid rgba(255, 255, 255, 0.95);
+            border-radius: 30px;
+            padding: 0.5rem 1.25rem;
+            text-decoration: none;
+            font-family: 'Syne', sans-serif;
+            font-size: 0.85rem;
+            font-weight: 700;
+            letter-spacing: 0.04em;
+            margin-bottom: 2rem;
+            box-shadow: 0 4px 16px rgba(80, 40, 160, 0.1);
+            backdrop-filter: blur(14px);
+            -webkit-backdrop-filter: blur(14px);
+            transition: all 0.25s;
+        }
+        .back-link:hover {
+            color: #1a0533;
+            background: #ffffff;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(80, 40, 160, 0.18);
+        }
+
+        .trending-title {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: clamp(2.5rem, 6vw, 4.4rem);
+            font-weight: 700;
+            color: #120224;
+            line-height: 1.12;
+            margin-bottom: 0.8rem;
+            text-shadow: 0 2px 24px rgba(255, 255, 255, 0.9);
+        }
+        .trending-title em {
+            font-style: italic;
+            color: #ea580c;
+        }
+
+        .trending-sub {
+            color: #2e1065;
+            font-size: 1.05rem;
+            font-weight: 600;
+            font-family: 'Syne', sans-serif;
+            max-width: 640px;
+            margin: 0 auto;
+            line-height: 1.5;
+        }
+
+        /* Region toggle */
+        .region-toggle {
+            display: inline-flex;
+            background: rgba(255, 255, 255, 0.75);
+            border: 1.5px solid rgba(255, 255, 255, 0.95);
+            border-radius: 50px;
+            padding: 0.35rem;
+            gap: 0.35rem;
+            margin-top: 1.8rem;
+            box-shadow: 0 8px 24px rgba(80, 40, 160, 0.12);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+        }
+        .region-btn {
+            padding: 0.65rem 1.6rem;
+            border-radius: 40px;
+            border: none;
+            background: transparent;
+            color: #4c1d95;
+            font-family: 'Syne', sans-serif;
+            font-size: 0.9rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.25s;
+        }
+        .region-btn.active {
+            background: linear-gradient(135deg, #ea580c, #dc2626);
+            color: #ffffff;
+            font-weight: 800;
+            box-shadow: 0 4px 16px rgba(234, 88, 12, 0.45);
+        }
+
+        /* Status bar */
+        .trending-status-wrap {
+            text-align: center;
+            margin-bottom: 2.2rem;
+        }
+        .trending-status {
+            display: inline-flex;
+            align-items: center;
+            font-size: 0.86rem;
+            font-family: 'Syne', sans-serif;
+            color: #1e1b4b;
+            font-weight: 700;
+            letter-spacing: 0.03em;
+            background: rgba(255, 255, 255, 0.8);
+            padding: 0.5rem 1.4rem;
+            border-radius: 30px;
+            border: 1.5px solid rgba(255, 255, 255, 0.95);
+            box-shadow: 0 4px 18px rgba(80, 40, 160, 0.1);
+            backdrop-filter: blur(14px);
+            -webkit-backdrop-filter: blur(14px);
+        }
+        .status-dot {
+            display: inline-block;
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #16a34a;
+            margin-right: 8px;
+            animation: pulse-dot 1.8s ease-in-out infinite;
+        }
+        @keyframes pulse-dot {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.4; transform: scale(0.7); }
+        }
+
+        /* Place cards grid */
+        .trending-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(360px, 1fr));
+            gap: 1.75rem;
+        }
+
+        .place-card {
+            background: rgba(255, 255, 255, 0.78);
+            backdrop-filter: blur(28px) saturate(180%);
+            -webkit-backdrop-filter: blur(28px) saturate(180%);
+            border: 1.5px solid rgba(255, 255, 255, 0.95);
+            border-radius: 24px;
+            padding: 1.8rem;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 16px 38px rgba(50, 15, 100, 0.08), 0 3px 10px rgba(0, 0, 0, 0.03);
+            transition: transform 0.25s, border-color 0.25s, box-shadow 0.25s;
+            animation: card-in 0.5s ease both;
+        }
+        .place-card:hover {
+            transform: translateY(-5px);
+            border-color: rgba(234, 88, 12, 0.55);
+            box-shadow: 0 20px 48px rgba(80, 40, 160, 0.18), 0 6px 18px rgba(234, 88, 12, 0.2);
+        }
+        @keyframes card-in {
+            from { opacity: 0; transform: translateY(20px); }
+            to   { opacity: 1; transform: translateY(0); }
+        }
+
+        .card-rank {
+            position: absolute;
+            top: 1.1rem;
+            right: 1.4rem;
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 3rem;
+            font-weight: 700;
+            color: rgba(76, 29, 149, 0.2);
+            line-height: 1;
+        }
+
+        .card-place-name {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 2rem;
+            font-weight: 700;
+            color: #120224;
+            margin-bottom: 0.35rem;
+            letter-spacing: -0.01em;
+        }
+        .card-post-count {
+            font-size: 0.76rem;
+            font-weight: 700;
+            color: #4c1d95;
+            font-family: 'Syne', sans-serif;
+            background: rgba(124, 58, 237, 0.09);
+            display: inline-block;
+            padding: 0.25rem 0.75rem;
+            border-radius: 14px;
+            border: 1px solid rgba(124, 58, 237, 0.18);
+            margin-bottom: 1.2rem;
+        }
+
+        /* Hype meter */
+        .hype-label {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 0.45rem;
+        }
+        .hype-title {
+            font-size: 0.75rem;
+            font-family: 'Syne', sans-serif;
+            font-weight: 800;
+            color: #4c1d95;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+        }
+        .hype-value {
+            font-size: 1.05rem;
+            font-family: 'Syne', sans-serif;
+            font-weight: 900;
+            color: #ea580c;
+        }
+        .hype-bar-wrap {
+            background: rgba(0, 0, 0, 0.08);
+            border: 1px solid rgba(255, 255, 255, 0.9);
+            border-radius: 6px;
+            height: 9px;
+            overflow: hidden;
+            margin-bottom: 1.3rem;
+        }
+        .hype-bar-fill {
+            height: 100%;
+            border-radius: 6px;
+            background: linear-gradient(90deg, #ea580c, #f59e0b);
+            box-shadow: 0 0 12px rgba(234, 88, 12, 0.45);
+            transition: width 1s ease;
+        }
+
+        /* Sentiment bars */
+        .sentiment-bars {
+            display: flex;
+            flex-direction: column;
+            gap: 0.65rem;
+            margin-bottom: 1.3rem;
+            background: rgba(255, 255, 255, 0.65);
+            border: 1.5px solid rgba(255, 255, 255, 0.95);
+            border-radius: 18px;
+            padding: 1rem 1.1rem;
+            box-shadow: inset 0 2px 6px rgba(0, 0, 0, 0.02);
+        }
+        .sent-row {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+        .sent-label {
+            width: 66px;
+            font-size: 0.74rem;
+            font-family: 'Syne', sans-serif;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+            flex-shrink: 0;
+        }
+        .sent-label.pos { color: #15803d; }
+        .sent-label.neu { color: #6d28d9; }
+        .sent-label.neg { color: #dc2626; }
+        .sent-track {
+            flex: 1;
+            background: rgba(0, 0, 0, 0.08);
+            border-radius: 6px;
+            height: 10px;
+            overflow: hidden;
+        }
+        .sent-fill {
+            height: 100%;
+            border-radius: 6px;
+            transition: width 1s ease 0.3s;
+        }
+        .sent-fill.pos { background: linear-gradient(90deg, #16a34a, #22c55e); }
+        .sent-fill.neu { background: linear-gradient(90deg, #7c3aed, #a855f7); }
+        .sent-fill.neg { background: linear-gradient(90deg, #dc2626, #ef4444); }
+        .sent-pct {
+            width: 38px;
+            text-align: right;
+            font-size: 0.84rem;
+            font-weight: 800;
+            color: #120224;
+            font-family: 'Syne', sans-serif;
+        }
+
+        /* Topics */
+        .card-topics {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.45rem;
+            margin-bottom: 1.3rem;
+        }
+        .topic-chip {
+            background: rgba(234, 88, 12, 0.1);
+            border: 1px solid rgba(234, 88, 12, 0.3);
+            color: #c2410c;
+            font-size: 0.74rem;
+            font-weight: 700;
+            font-family: 'Syne', sans-serif;
+            padding: 0.3rem 0.8rem;
+            border-radius: 20px;
+        }
+
+        /* Review snippets */
+        .snippet-title {
+            font-size: 0.75rem;
+            font-family: 'Syne', sans-serif;
+            font-weight: 800;
+            color: #3b0764;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            margin-bottom: 0.75rem;
+        }
+        .snippet-list {
+            display: flex;
+            flex-direction: column;
+            gap: 0.65rem;
+        }
+        .snippet-item {
+            background: #ffffff;
+            border: 1px solid rgba(80, 40, 160, 0.12);
+            border-left-width: 4px;
+            border-radius: 0 12px 12px 0;
+            padding: 0.75rem 0.95rem;
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.04);
+        }
+        .snippet-item.pos { border-left-color: #16a34a; }
+        .snippet-item.neg { border-left-color: #dc2626; }
+        .snippet-item.neu { border-left-color: #7c3aed; }
+        .snippet-text {
+            font-size: 0.84rem;
+            font-weight: 600;
+            color: #15022e;
+            line-height: 1.48;
+            margin-bottom: 0.4rem;
+        }
+        .snippet-meta {
+            font-size: 0.74rem;
+            font-weight: 700;
+            color: #4b5563;
+            display: flex;
+            gap: 0.5rem;
+            align-items: center;
+        }
+        .snippet-meta a {
+            color: #ea580c;
+            font-weight: 800;
+            text-decoration: none;
+        }
+        .snippet-meta a:hover {
+            text-decoration: underline;
+        }
+
+        /* Loading skeleton */
+        .skeleton-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(360px, 1fr));
+            gap: 1.75rem;
+        }
+        .skeleton-card {
+            background: rgba(255, 255, 255, 0.75);
+            border: 1.5px solid rgba(255, 255, 255, 0.95);
+            border-radius: 24px;
+            padding: 1.8rem;
+            animation: shimmer 1.8s ease-in-out infinite;
+        }
+        .skel-line {
+            background: rgba(0, 0, 0, 0.08);
+            border-radius: 6px;
+            margin-bottom: 0.8rem;
+        }
+        @keyframes shimmer {
+            0%, 100% { opacity: 0.6; }
+            50% { opacity: 1; }
+        }
+
+        /* Empty / error state */
+        .empty-state {
+            text-align: center;
+            padding: 4rem 2rem;
+            color: #3b0764;
+            font-family: 'Syne', sans-serif;
+            font-weight: 700;
+        }
+        .empty-state .emoji { font-size: 3rem; margin-bottom: 1rem; }
+
+        /* Trending nav button (also used in index) */
+        .trending-nav-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.65rem 1.4rem;
+            border-radius: 40px;
+            background: rgba(249, 115, 22, 0.15);
+            border: 1px solid rgba(249, 115, 22, 0.35);
+            color: #ea580c;
+            font-family: 'Syne', sans-serif;
+            font-size: 0.85rem;
+            font-weight: 700;
+            text-decoration: none;
+            letter-spacing: 0.04em;
+            transition: all 0.25s;
+            margin-top: 1rem;
+        }
+        .trending-nav-btn:hover {
+            background: rgba(249, 115, 22, 0.25);
+            border-color: rgba(249, 115, 22, 0.6);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 24px rgba(249, 115, 22, 0.25);
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Background -->
+    <div class="bg-scene" id="bgScene">
+        <div class="aurora aurora-1"></div>
+        <div class="aurora aurora-2"></div>
+        <div class="aurora aurora-3"></div>
+        <div class="aurora aurora-4"></div>
+        <div class="aurora aurora-5"></div>
+        <div class="grain-overlay"></div>
+    </div>
+    <div class="cursor-orb" id="cursorOrb"></div>
+    <div class="cursor-dot" id="cursorDot"></div>
+
+    <div class="app">
+        <div class="container trending-page">
+
+            <!-- Header -->
+            <div class="trending-header">
+                <a href="/" class="back-link">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M19 12H5M12 5l-7 7 7 7"/>
+                    </svg>
+                    Back to Trip Planner
+                </a>
+                <h1 class="trending-title">
+                    What's <em>Trending</em><br/>on Reddit Right Now
+                </h1>
+                <p class="trending-sub">
+                    Live sentiment analysis from real traveler posts across Reddit's travel communities
+                </p>
+                <div class="region-toggle">
+                    <button class="region-btn active" id="btnIndia" onclick="loadRegion('india')">🇮🇳 India</button>
+                    <button class="region-btn" id="btnWorld" onclick="loadRegion('world')">🌍 Worldwide</button>
+                </div>
+            </div>
+
+            <!-- Status -->
+            <div class="trending-status-wrap">
+                <div class="trending-status" id="trendingStatus">
+                    <span class="status-dot"></span>
+                    Scanning Reddit for live travel discussions…
+                </div>
+            </div>
+
+            <!-- Cards -->
+            <div id="trendingContent">
+                <!-- Skeleton loader -->
+                <div class="skeleton-grid" id="skeletonGrid">
+                    <div class="skeleton-card">
+                        <div class="skel-line" style="height:28px;width:55%"></div>
+                        <div class="skel-line" style="height:12px;width:30%;opacity:0.5"></div>
+                        <div class="skel-line" style="height:8px;width:100%;margin-top:1.2rem"></div>
+                        <div class="skel-line" style="height:8px;width:100%"></div>
+                        <div class="skel-line" style="height:8px;width:100%"></div>
+                        <div class="skel-line" style="height:50px;width:100%;margin-top:1rem;border-radius:10px"></div>
+                    </div>
+                    <div class="skeleton-card">
+                        <div class="skel-line" style="height:28px;width:60%"></div>
+                        <div class="skel-line" style="height:12px;width:35%;opacity:0.5"></div>
+                        <div class="skel-line" style="height:8px;width:100%;margin-top:1.2rem"></div>
+                        <div class="skel-line" style="height:8px;width:100%"></div>
+                        <div class="skel-line" style="height:8px;width:80%"></div>
+                        <div class="skel-line" style="height:50px;width:100%;margin-top:1rem;border-radius:10px"></div>
+                    </div>
+                    <div class="skeleton-card">
+                        <div class="skel-line" style="height:28px;width:45%"></div>
+                        <div class="skel-line" style="height:12px;width:28%;opacity:0.5"></div>
+                        <div class="skel-line" style="height:8px;width:100%;margin-top:1.2rem"></div>
+                        <div class="skel-line" style="height:8px;width:90%"></div>
+                        <div class="skel-line" style="height:8px;width:100%"></div>
+                        <div class="skel-line" style="height:50px;width:100%;margin-top:1rem;border-radius:10px"></div>
+                    </div>
+                </div>
+                <div class="trending-grid" id="trendingGrid" style="display:none"></div>
+            </div>
+
+        </div>
+    </div>
+
+    <script src="{{ url_for('static', filename='app.js') }}"></script>
+    <script>
+        let currentRegion = 'india';
+
+        function loadRegion(region) {
+            currentRegion = region;
+
+            document.getElementById('btnIndia').classList.toggle('active', region === 'india');
+            document.getElementById('btnWorld').classList.toggle('active', region === 'world');
+
+            document.getElementById('skeletonGrid').style.display = 'grid';
+            document.getElementById('trendingGrid').style.display = 'none';
+            document.getElementById('trendingStatus').innerHTML =
+                '<span class="status-dot"></span> Scanning Reddit for live ' +
+                (region === 'india' ? 'India' : 'worldwide') + ' travel discussions…';
+
+            fetch(`/trending-data?region=${region}`)
+                .then(r => r.json())
+                .then(data => {
+                    document.getElementById('skeletonGrid').style.display = 'none';
+                    if (!data.success || !data.places || data.places.length === 0) {
+                        document.getElementById('trendingGrid').innerHTML =
+                            '<div class="empty-state"><div class="emoji">🌐</div>' +
+                            '<p>No trending data found right now. Reddit may be rate-limiting. Try again in a moment.</p></div>';
+                        document.getElementById('trendingGrid').style.display = 'block';
+                        document.getElementById('trendingStatus').innerHTML = '⚠️ Could not fetch live data';
+                        return;
+                    }
+                    renderCards(data.places);
+                    const isLive = data.places[0] && (data.places[0].source === 'reddit' || data.places[0].source === 'reddit_live');
+                    const dotColor = isLive ? '#22c55e' : '#f97316';
+                    const label = isLive ? 'Live Reddit API · ' : 'Reddit Traveler Pulse · ';
+                    document.getElementById('trendingStatus').innerHTML =
+                        `<span class="status-dot" style="background:${dotColor}"></span> ${label}${data.places.length} destinations analyzed from Reddit posts · Sorted by hype score`;
+                })
+                .catch(err => {
+                    document.getElementById('skeletonGrid').style.display = 'none';
+                    document.getElementById('trendingGrid').innerHTML =
+                        '<div class="empty-state"><div class="emoji">⚠️</div><p>Error loading data: ' + err.message + '</p></div>';
+                    document.getElementById('trendingGrid').style.display = 'block';
+                    document.getElementById('trendingStatus').innerHTML = '⚠️ Error fetching Reddit data';
+                });
+        }
+
+        function renderCards(places) {
+            const grid = document.getElementById('trendingGrid');
+            grid.innerHTML = '';
+
+            // Max hype for bar scaling
+            const maxHype = Math.max(...places.map(p => p.hype_score || 1));
+
+            places.forEach((place, idx) => {
+                const posP = Math.round((place.positive_ratio || 0) * 100);
+                const neuP = Math.round((place.neutral_ratio || 0) * 100);
+                const negP = Math.round((place.negative_ratio || 0) * 100);
+                const hypeP = Math.round(((place.hype_score || 0) / maxHype) * 100);
+
+                const topicsHtml = (place.top_topics || []).map(t =>
+                    `<span class="topic-chip">${t}</span>`
+                ).join('');
+
+                // Build review snippets
+                const snippets = place.review_snippets || {};
+                let snippetsHtml = '';
+                const sentTypes = [
+                    { key: 'positive', cls: 'pos', emoji: '✅' },
+                    { key: 'negative', cls: 'neg', emoji: '⚠️' },
+                    { key: 'neutral',  cls: 'neu', emoji: '💬' },
+                ];
+                let snippetCount = 0;
+                for (const { key, cls, emoji } of sentTypes) {
+                    const list = snippets[key] || [];
+                    if (list.length > 0 && snippetCount < 2) {
+                        const s = list[0];
+                        snippetsHtml += `
+                            <div class="snippet-item ${cls}">
+                                <div class="snippet-text">${emoji} ${s.text}</div>
+                                <div class="snippet-meta">
+                                    r/${s.subreddit} &middot; ▲ ${s.score}
+                                    &middot; <a href="${s.url}" target="_blank" rel="noopener">view post ↗</a>
+                                </div>
+                            </div>`;
+                        snippetCount++;
+                    }
+                }
+
+                const cardHtml = `
+                    <div class="place-card" style="animation-delay:${idx * 0.08}s">
+                        <div class="card-rank">#${idx + 1}</div>
+                        <div class="card-place-name">${place.place_name}</div>
+                        <div class="card-post-count">${place.review_count} Reddit posts analysed</div>
+
+                        <div class="hype-label">
+                            <span class="hype-title">Hype Score</span>
+                            <span class="hype-value">${place.hype_score}</span>
+                        </div>
+                        <div class="hype-bar-wrap">
+                            <div class="hype-bar-fill" style="width:0%" data-target="${hypeP}%"></div>
+                        </div>
+
+                        <div class="sentiment-bars">
+                            <div class="sent-row">
+                                <span class="sent-label pos">Positive</span>
+                                <div class="sent-track">
+                                    <div class="sent-fill pos" style="width:0%" data-target="${posP}%"></div>
+                                </div>
+                                <span class="sent-pct">${posP}%</span>
+                            </div>
+                            <div class="sent-row">
+                                <span class="sent-label neu">Neutral</span>
+                                <div class="sent-track">
+                                    <div class="sent-fill neu" style="width:0%" data-target="${neuP}%"></div>
+                                </div>
+                                <span class="sent-pct">${neuP}%</span>
+                            </div>
+                            <div class="sent-row">
+                                <span class="sent-label neg">Negative</span>
+                                <div class="sent-track">
+                                    <div class="sent-fill neg" style="width:0%" data-target="${negP}%"></div>
+                                </div>
+                                <span class="sent-pct">${negP}%</span>
+                            </div>
+                        </div>
+
+                        ${topicsHtml ? `<div class="card-topics">${topicsHtml}</div>` : ''}
+
+                        ${snippetsHtml ? `
+                        <div class="snippet-title">What Redditors are saying</div>
+                        <div class="snippet-list">${snippetsHtml}</div>` : ''}
+                    </div>`;
+
+                grid.insertAdjacentHTML('beforeend', cardHtml);
+            });
+
+            grid.style.display = 'grid';
+
+            // Animate bars after a short delay
+            setTimeout(() => {
+                grid.querySelectorAll('[data-target]').forEach(el => {
+                    el.style.width = el.dataset.target;
+                });
+            }, 100);
+        }
+
+        // Load on page open
+        loadRegion('india');
+    </script>
+</body>
+
+</html>

@@ -7,10 +7,16 @@ from flask import Flask, render_template, request, jsonify
 from flask_cors import CORS
 from dotenv import load_dotenv
 import google.generativeai as genai
+from services.sma import get_sma_for_place, get_trending_places
 
 load_dotenv()
 
-app = Flask(__name__)
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+app = Flask(
+    __name__,
+    template_folder=os.path.join(BASE_DIR, "templates"),
+    static_folder=os.path.join(BASE_DIR, "static")
+)
 CORS(app)
 
 GEMINI_API_KEY         = os.getenv("GEMINI_API_KEY")
@@ -77,7 +83,7 @@ def search_foursquare(query, location, categories=None, limit=10):
             url,
             headers={"Authorization": FOURSQUARE_API_KEY, "Accept": "application/json"},
         )
-        with urllib.request.urlopen(req, timeout=10) as r:
+        with urllib.request.urlopen(req, timeout=2) as r:
             data = json.loads(r.read().decode())
         places = []
         for p in data.get("results", []):
@@ -394,16 +400,37 @@ def generate():
             restaurants_data = get_google_places_restaurants(destination, dietary)
             print(f"Google Places: {len(restaurants_data.get('restaurants',[]))} found" if restaurants_data.get("success") else "Google Places failed")
 
-        # 5. Gemini
+        # 5. Gemini with multi-model fallback
         prompt = build_prompt(data, weather_info, exchange_info, foursquare_data, restaurants_data)
         print(f"Calling Gemini AI for {data.get('days')} day trip to {destination}...")
 
-        model = genai.GenerativeModel('gemini-3.5-flash', generation_config={"response_mime_type": "application/json"})
-        response = model.generate_content(prompt)
+        plan = None
+        models_to_try = [
+            'gemini-3.5-flash-lite',
+            'gemini-3.8-flash',
+            'gemini-3.7-flash',
+            'gemini-flash-lite-latest',
+            'gemini-flash-latest'
+        ]
+        last_error = None
 
-        raw  = response.text.strip()
-        raw  = raw.replace("```json", "").replace("```", "").strip()
-        plan = json.loads(raw)
+        for model_name in models_to_try:
+            try:
+                print(f"Attempting trip generation with model: {model_name}...")
+                model = genai.GenerativeModel(model_name, generation_config={"response_mime_type": "application/json"})
+                response = model.generate_content(prompt)
+                raw  = response.text.strip()
+                raw  = raw.replace("```json", "").replace("```", "").strip()
+                plan = json.loads(raw)
+                print(f"Success generating trip plan with {model_name}!")
+                break
+            except Exception as e:
+                print(f"Model {model_name} failed: {e}")
+                last_error = e
+                continue
+
+        if not plan:
+            raise Exception(f"AI Quota temporarily reached on model: {str(last_error)}")
 
         # Attach live data
         if weather_info and weather_info.get("success"):
@@ -429,10 +456,47 @@ def generate():
         return jsonify({"error": str(e)}), 500
 
 
+# ─── REDDIT SOCIAL BUZZ (for user-entered place) ─────────────────────────────
+
+@app.route("/reddit-buzz", methods=["POST"])
+def reddit_buzz():
+    """Returns real Reddit sentiment for a user-entered place."""
+    try:
+        data = request.get_json()
+        place = data.get("place", "").strip()
+        region = data.get("region", "india")  # "india" or "world"
+        if not place:
+            return jsonify({"error": "place is required"}), 400
+        result = get_sma_for_place(place, place, region=region)
+        return jsonify({"success": True, "buzz": result})
+    except Exception as e:
+        print(f"Reddit buzz error: {e}")
+        return jsonify({"error": str(e)}), 500
+
+
+# ─── TRENDING PLACES (Trending Now page) ──────────────────────────────────────
+
+@app.route("/trending")
+def trending_page():
+    return render_template("trending.html")
+
+
+@app.route("/trending-data", methods=["GET"])
+def trending_data():
+    """Returns trending place data from Reddit for the Trending Now page."""
+    try:
+        region = request.args.get("region", "india")  # "india" or "world"
+        results = get_trending_places(region=region, top_n=6)
+        return jsonify({"success": True, "places": results, "region": region})
+    except Exception as e:
+        print(f"Trending data error: {e}")
+        return jsonify({"error": str(e)}), 500
+
+
 if __name__ == "__main__":
     port  = int(os.getenv("PORT", 5000))
     debug = os.getenv("FLASK_DEBUG", "false").lower() == "true"
-    print(f"\n🇮🇳 Voyagr India — Trip Planner running on http://localhost:{port}")
+    print(f"\nVoyagr India -- Trip Planner running on http://localhost:{port}")
     print(f"Gemini:       {'YES' if GEMINI_API_KEY         else 'NOT FOUND'}")
     print(f"OpenWeather:  {'YES' if OPENWEATHER_API_KEY  else 'NOT FOUND'}")
     print(f"Foursquare:   {'YES' if FOURSQUARE_API_KEY   else 'NOT FOUND'}")

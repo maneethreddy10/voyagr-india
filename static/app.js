@@ -138,6 +138,8 @@ async function handleGenerate() {
             document.getElementById('resultsSection').style.display = 'block';
             renderResults(result.plan);
             window.scrollTo({ top: 0, behavior: 'smooth' });
+            // Fetch Reddit Social Buzz for the entered place (non-blocking)
+            fetchSocialBuzz(data.destination, data.tripType);
         } else {
             showError(result.error || 'Something went wrong. Please try again.');
         }
@@ -642,6 +644,110 @@ function animateBudgetBars() {
         bar.style.width = '0';
         setTimeout(() => bar.style.width = w, 50);
     });
+}
+
+
+// ─── SOCIAL BUZZ (Reddit) ───────────────────────────────────────────────────
+
+async function fetchSocialBuzz(place, tripType) {
+    const buzzCard = document.getElementById('socialBuzzCard');
+    if (!buzzCard) return;
+    buzzCard.style.display = 'none';
+    try {
+        const region = (tripType && tripType.toLowerCase().includes('domestic')) ? 'india' : 'world';
+        const res = await fetch('/reddit-buzz', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ place, region }),
+        });
+        const data = await res.json();
+        if (data.success && data.buzz) {
+            renderSocialBuzz(data.buzz, place);
+        }
+    } catch (e) {
+        console.warn('Social buzz fetch failed:', e);
+    }
+}
+
+function renderSocialBuzz(buzz, place) {
+    const card = document.getElementById('socialBuzzCard');
+    if (!card) return;
+
+    document.getElementById('buzzPlaceName').textContent = place;
+    document.getElementById('buzzSource').textContent =
+        buzz.source === 'reddit' ? '🔴 Live Reddit' : '🌐 Reddit Sentiment';
+
+    const posP = Math.round((buzz.positive_ratio || 0) * 100);
+    const neuP = Math.round((buzz.neutral_ratio  || 0) * 100);
+    const negP = Math.round((buzz.negative_ratio || 0) * 100);
+
+    document.getElementById('buzzBars').innerHTML = `
+        <div class="buzz-bars-wrap">
+            <div class="buzz-stat-row">
+                <span class="buzz-stat-label pos">Positive</span>
+                <div class="buzz-track"><div class="buzz-fill buzz-pos" data-w="${posP}"></div></div>
+                <span class="buzz-pct">${posP}%</span>
+            </div>
+            <div class="buzz-stat-row">
+                <span class="buzz-stat-label neu">Neutral</span>
+                <div class="buzz-track"><div class="buzz-fill buzz-neu" data-w="${neuP}"></div></div>
+                <span class="buzz-pct">${neuP}%</span>
+            </div>
+            <div class="buzz-stat-row">
+                <span class="buzz-stat-label neg">Negative</span>
+                <div class="buzz-track"><div class="buzz-fill buzz-neg" data-w="${negP}"></div></div>
+                <span class="buzz-pct">${negP}%</span>
+            </div>
+            <div class="buzz-post-count">
+                Based on ${buzz.review_count} Reddit traveler discussions analysed
+            </div>
+        </div>`;
+
+    // Topics
+    const topicsEl = document.getElementById('buzzTopics');
+    if (buzz.top_topics && buzz.top_topics.length > 0) {
+        topicsEl.innerHTML = '<div style="display:flex;flex-wrap:wrap;gap:0.4rem;margin-bottom:1.2rem">' +
+            buzz.top_topics.map(t => `<span class="buzz-topic-chip">${t}</span>`).join('') +
+            '</div>';
+    } else {
+        topicsEl.innerHTML = '';
+    }
+
+    // Review snippets
+    const snippets = buzz.review_snippets || {};
+    let snippetsHtml = '';
+    const sentTypes = [
+        { key: 'positive', cls: 'buzz-snippet-pos', emoji: '✅' },
+        { key: 'negative', cls: 'buzz-snippet-neg', emoji: '⚠️' },
+        { key: 'neutral',  cls: 'buzz-snippet-neu', emoji: '💬' },
+    ];
+    for (const { key, cls, emoji } of sentTypes) {
+        const list = snippets[key] || [];
+        if (list.length > 0) {
+            const s = list[0];
+            snippetsHtml += `
+                <div class="buzz-snippet-item ${cls}">
+                    <div class="buzz-snippet-text">${emoji} ${s.text}</div>
+                    <div class="buzz-snippet-meta">
+                        r/${s.subreddit} &middot; ▲ ${s.score}
+                        &middot; <a href="${s.url}" target="_blank" rel="noopener">view post ↗</a>
+                    </div>
+                </div>`;
+        }
+    }
+
+    document.getElementById('buzzReviews').innerHTML = snippetsHtml
+        ? `<div class="buzz-snippets-label">What Redditors are saying</div><div class="buzz-snippet-list">${snippetsHtml}</div>`
+        : '';
+
+    card.style.display = 'block';
+
+    // Animate bars
+    setTimeout(() => {
+        card.querySelectorAll('.buzz-fill[data-w]').forEach(el => {
+            el.style.width = el.dataset.w + '%';
+        });
+    }, 100);
 }
 
 
