@@ -19,6 +19,23 @@ app = Flask(
 )
 CORS(app)
 
+
+class PrefixMiddleware(object):
+    """Normalizes PATH_INFO from Vercel serverless rewrites so Flask routes match cleanly."""
+    def __init__(self, wsgi_app):
+        self.wsgi_app = wsgi_app
+
+    def __call__(self, environ, start_response):
+        path_info = environ.get('PATH_INFO', '')
+        for prefix in ['/api/index.py', '/api/index', '/api']:
+            if path_info.startswith(prefix):
+                environ['PATH_INFO'] = path_info[len(prefix):] or '/'
+                break
+        return self.wsgi_app(environ, start_response)
+
+
+app.wsgi_app = PrefixMiddleware(app.wsgi_app)
+
 GEMINI_API_KEY         = os.getenv("GEMINI_API_KEY")
 OPENWEATHER_API_KEY  = os.getenv("OPENWEATHER_API_KEY")
 FOURSQUARE_API_KEY   = os.getenv("FOURSQUARE_API_KEY")
